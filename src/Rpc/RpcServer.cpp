@@ -733,8 +733,8 @@ bool RpcServer::on_get_info(const COMMAND_RPC_GET_INFO::request& req, COMMAND_RP
 //$$
   res.last_known_block_index = std::max(static_cast<uint32_t>(1), m_protocolQuery.getObservedHeight()) -1;
 //$$
-  res.full_deposit_amount = m_core.fullDepositAmount();
-  res.full_deposit_interest = m_core.fullDepositInterest();
+//  res.full_deposit_amount = m_core.fullDepositAmount();
+//  res.full_deposit_interest = m_core.fullDepositInterest();
   res.status = CORE_RPC_STATUS_OK;
   return true;
 }
@@ -815,7 +815,7 @@ bool RpcServer::on_send_raw_tx(const COMMAND_RPC_SEND_RAW_TX::request& req, COMM
     return true;
   }
 
-  if (tvc.m_verifivation_failed)
+  if (tvc.m_verification_failed)
   {
     logger(INFO) << "[on_send_raw_tx]: tx verification failed";
     res.status = "Failed";

@@ -84,6 +84,8 @@ namespace CryptoNote {
     difficulty_type getDifficultyForNextBlock();
     uint64_t getCoinsInCirculation();
     uint8_t for_height_get_block_major_version(uint64_t height) const;
+//    uint8_t get_block_major_version_for_height(uint64_t height) const;
+
     bool addNewBlock(const Block& bl_, block_verification_context& bvc);
     bool resetAndSetGenesisBlock(const Block& b);
     bool haveBlock(const Crypto::Hash& id);
@@ -93,6 +95,8 @@ namespace CryptoNote {
     uint32_t findBlockchainSupplement(const std::vector<Crypto::Hash>& qblock_ids); // !!!!
     std::vector<Crypto::Hash> findBlockchainSupplement(const std::vector<Crypto::Hash>& remoteBlockIds, size_t maxCount,
       uint32_t& totalBlockCount, uint32_t& startBlockIndex);
+      uint8_t getBlockMajorVersionForHeight(uint32_t height) const;
+	uint8_t blockMajorVersion;
     bool handleGetObjects(NOTIFY_REQUEST_GET_OBJECTS_request& arg, NOTIFY_RESPONSE_GET_OBJECTS_request& rsp); //Deprecated. Should be removed with CryptoNoteProtocolHandler.
     bool getRandomOutsByAmount(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request& req, COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_response& res);
     bool getBackwardBlocksSize(size_t from_height, std::vector<size_t>& sz, size_t count);
@@ -113,10 +117,11 @@ namespace CryptoNote {
     bool isBlockInMainChain(const Crypto::Hash& blockId);
     uint64_t fullDepositAmount() const;
     uint64_t depositAmountAtHeight(size_t height) const;
-    uint64_t fullDepositInterest() const;
+//    uint64_t fullDepositInterest() const;
     uint64_t depositInterestAtHeight(size_t height) const;
     uint64_t coinsEmittedAtHeight(uint64_t height);
     uint64_t difficultyAtHeight(uint64_t height);
+    bool isInCheckpointZone(const uint32_t height);
 
     template<class visitor_t> bool scanOutputKeysForIndexes(const KeyInput& tx_in_to_key, visitor_t& vis, uint32_t* pmax_related_block_height = NULL);
 
@@ -186,6 +191,8 @@ namespace CryptoNote {
       }
     };
 
+bool rollbackBlockchainTo(uint32_t height);
+bool have_tx_keyimg_as_spent(const Crypto::KeyImage &key_im);
   private:
 
     struct MultisignatureOutputUsage {
@@ -301,7 +308,7 @@ namespace CryptoNote {
     bool checkTransactionInputs(const Transaction& tx, const Crypto::Hash& tx_prefix_hash, uint32_t* pmax_used_block_height = NULL);
     bool checkTransactionInputs(const Transaction& tx, uint32_t* pmax_used_block_height = NULL);
     bool check_tx_outputs(const Transaction& tx) const;
-    bool have_tx_keyimg_as_spent(const Crypto::KeyImage &key_im);
+//    bool have_tx_keyimg_as_spent(const Crypto::KeyImage &key_im);
     const TransactionEntry& transactionByIndex(TransactionIndex index);
     bool pushBlock(const Block& blockData, block_verification_context& bvc);
     bool pushBlock(const Block& blockData, const std::vector<Transaction>& transactions, block_verification_context& bvc);
@@ -311,7 +318,8 @@ namespace CryptoNote {
     void popTransaction(const Transaction& transaction, const Crypto::Hash& transactionHash);
     void popTransactions(const BlockEntry& block, const Crypto::Hash& minerTransactionHash);
     bool validateInput(const MultisignatureInput& input, const Crypto::Hash& transactionHash, const Crypto::Hash& transactionPrefixHash, const std::vector<Crypto::Signature>& transactionSignatures);
-
+    bool removeLastBlock();
+    bool checkCheckpoints(uint32_t& lastValidCheckpointHeight);    
     bool storeBlockchainIndices();
     bool loadBlockchainIndices();
 

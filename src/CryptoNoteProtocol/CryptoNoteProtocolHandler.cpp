@@ -286,7 +286,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_block(int command, NOTIFY_NEW_B
 		CryptoNote::tx_verification_context tvc = boost::value_initialized<decltype(tvc)>();
 		m_core.handle_incoming_tx(asBinaryArray(*tx_blob_it), tvc, true);
 		
-		if (tvc.m_verifivation_failed) {
+		if (tvc.m_verification_failed) {
 			
 			logger(Logging::INFO) 
 				<< context 
@@ -304,7 +304,7 @@ int CryptoNoteProtocolHandler::handle_notify_new_block(int command, NOTIFY_NEW_B
 	m_core.handle_incoming_block_blob(asBinaryArray(arg.b.block), bvc, true, false);
 //	logger(Logging::INFO) << "FINISH handle_incoming_block_blob";
 ////  
-	if (bvc.m_verifivation_failed) {
+	if (bvc.m_verification_failed) {
 		
 		logger(Logging::DEBUGGING) 
 			<< context 
@@ -356,10 +356,10 @@ int CryptoNoteProtocolHandler::handle_notify_new_transactions(int command, NOTIF
   for (auto tx_blob_it = arg.txs.begin(); tx_blob_it != arg.txs.end();) {
     CryptoNote::tx_verification_context tvc = boost::value_initialized<decltype(tvc)>();
     m_core.handle_incoming_tx(asBinaryArray(*tx_blob_it), tvc, false);
-    if (tvc.m_verifivation_failed) {
+    if (tvc.m_verification_failed) {
       logger(Logging::INFO) << context << "Tx verification failed";
     }
-    if (!tvc.m_verifivation_failed && tvc.m_should_be_relayed) {
+    if (!tvc.m_verification_failed && tvc.m_should_be_relayed) {
       ++tx_blob_it;
     } else {
       tx_blob_it = arg.txs.erase(tx_blob_it);
@@ -505,7 +505,7 @@ int CryptoNoteProtocolHandler::processObjects(CryptoNoteConnectionContext& conte
 			tx_verification_context tvc = boost::value_initialized<decltype(tvc)>();
 			m_core.handle_incoming_tx(asBinaryArray(tx_blob), tvc, true);
 			
-			if (tvc.m_verifivation_failed) {
+			if (tvc.m_verification_failed) {
 			  
 				logger(Logging::DEBUGGING, RED) 
 					<< context 
@@ -522,7 +522,7 @@ int CryptoNoteProtocolHandler::processObjects(CryptoNoteConnectionContext& conte
 		block_verification_context bvc = boost::value_initialized<block_verification_context>();
 		m_core.handle_incoming_block_blob(asBinaryArray(block_entry.block), bvc, false, false);
 
-		if (bvc.m_verifivation_failed) {
+		if (bvc.m_verification_failed) {
 			
 			logger(Logging::DEBUGGING) 
 				<< context 

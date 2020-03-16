@@ -175,7 +175,7 @@ size_t core::addChain(const std::vector<const IBlock*>& chain) {
 
 		block_verification_context bvc = boost::value_initialized<block_verification_context>();
 		m_blockchain.addNewBlock(block->getBlock(), bvc);
-		if (bvc.m_marked_as_orphaned || bvc.m_verifivation_failed) {
+		if (bvc.m_marked_as_orphaned || bvc.m_verification_failed) {
 			logger(ERROR, BRIGHT_RED) << 
 				"core::addChain() failed to handle incoming block " << get_block_hash(block->getBlock()) << ", " << blocksCounter << "/" << chain.size();
 			break;
@@ -195,7 +195,7 @@ bool core::handle_incoming_tx(const BinaryArray& tx_blob, tx_verification_contex
 
   if (tx_blob.size() > m_currency.maxTxSize()) {
     logger(INFO) << "WRONG TRANSACTION BLOB, too big size " << tx_blob.size() << ", rejected";
-    tvc.m_verifivation_failed = true;
+    tvc.m_verification_failed = true;
     return false;
   }
 
@@ -205,7 +205,7 @@ bool core::handle_incoming_tx(const BinaryArray& tx_blob, tx_verification_contex
 
   if (!parse_tx_from_blob(tx, tx_hash, tx_prefixt_hash, tx_blob)) {
     logger(INFO) << "WRONG TRANSACTION BLOB, Failed to parse, rejected";
-    tvc.m_verifivation_failed = true;
+    tvc.m_verification_failed = true;
     return false;
   }
   //std::cout << "!"<< tx.inputs.size() << std::endl;
@@ -484,7 +484,7 @@ bool core::handle_block_found(Block& b) {
 	block_verification_context bvc = boost::value_initialized<block_verification_context>();
 	handle_incoming_block(b, bvc, true, true);
 
-	if (bvc.m_verifivation_failed) {
+	if (bvc.m_verification_failed) {
 		logger(ERROR) << "mined block failed verification";
 	}
 
@@ -541,7 +541,7 @@ bool core::handle_incoming_block_blob(const BinaryArray& block_blob, block_verif
 			<< block_blob.size() 
 			<< ", rejected";
 			
-		bvc.m_verifivation_failed = true;
+		bvc.m_verification_failed = true;
 		return false;
 	}
 
@@ -551,7 +551,7 @@ bool core::handle_incoming_block_blob(const BinaryArray& block_blob, block_verif
 		logger(INFO) 
 			<< "Failed to parse and validate new block";
 			
-		bvc.m_verifivation_failed = true;
+		bvc.m_verification_failed = true;
 		return false;
 	}
 
@@ -1074,37 +1074,37 @@ uint64_t core::getTotalGeneratedAmount() {
 	return m_blockchain.getCoinsInCirculation();
 }
 // --------------------------------
-uint64_t core::fullDepositAmount() const {
-	return m_blockchain.fullDepositAmount();
-}
+//uint64_t core::fullDepositAmount() const {
+//	return m_blockchain.fullDepositAmount();
+//}
 // --------------------------------
-uint64_t core::depositAmountAtHeight(size_t height) const {
-	return m_blockchain.depositAmountAtHeight(height);
-}
+//uint64_t core::depositAmountAtHeight(size_t height) const {
+//	return m_blockchain.depositAmountAtHeight(height);
+//}
 // --------------------------------
-uint64_t core::fullDepositInterest() const {
-	return m_blockchain.fullDepositInterest();
-}
+//uint64_t core::fullDepositInterest() const {
+//	return m_blockchain.fullDepositInterest();
+//}
 // --------------------------------
-uint64_t core::depositInterestAtHeight(size_t height) const {
-	return m_blockchain.depositInterestAtHeight(height);
-}
+//uint64_t core::depositInterestAtHeight(size_t height) const {
+//	return m_blockchain.depositInterestAtHeight(height);
+//}
 // --------------------------------
 bool core::handleIncomingTransaction(const Transaction& tx, const Crypto::Hash& txHash, size_t blobSize, tx_verification_context& tvc, bool keptByBlock) {
   if (!check_tx_syntax(tx)) {
     logger(INFO, RED) << "WRONG TRANSACTION BLOB, Failed to check tx " << txHash << " syntax, rejected";
-    tvc.m_verifivation_failed = true;
+    tvc.m_verification_failed = true;
     return false;
   }
 
   if (!check_tx_semantic(tx, keptByBlock)) {
     logger(INFO, RED) << "WRONG TRANSACTION BLOB, Failed to check tx " << txHash << " semantic, rejected";
-    tvc.m_verifivation_failed = true;
+    tvc.m_verification_failed = true;
     return false;
   }
 
   bool r = add_new_tx(tx, txHash, blobSize, tvc, keptByBlock);
-  if (tvc.m_verifivation_failed) {
+  if (tvc.m_verification_failed) {
     if (!tvc.m_tx_fee_too_small) {
       logger(ERROR, RED) << "Transaction verification failed: " << txHash;
     } else {

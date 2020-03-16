@@ -106,7 +106,7 @@ namespace CryptoNote {
 
   bool tx_memory_pool::add_tx(const Transaction &tx, /*const Crypto::Hash& tx_prefix_hash,*/ const Crypto::Hash &id, size_t blobSize, tx_verification_context& tvc, bool keptByBlock) {
     if (!check_inputs_types_supported(tx)) {
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       return false;
     }
 
@@ -116,7 +116,7 @@ namespace CryptoNote {
     if (outputs_amount > inputs_amount) {
       logger(INFO) << "transaction use more money then it has: use " << m_currency.formatAmount(outputs_amount) <<
         ", have " << m_currency.formatAmount(inputs_amount);
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       return false;
     }
 
@@ -132,7 +132,7 @@ namespace CryptoNote {
     if (!keptByBlock && !isFusionTransaction && ttl.ttl == 0 && fee < m_currency.minimumFee()) {
       logger(INFO) << "transaction fee is not enough: " << m_currency.formatAmount(fee) <<
         ", minimum fee: " << m_currency.formatAmount(m_currency.minimumFee());
-      tvc.m_verifivation_failed = true;
+      tvc.m_verification_failed = true;
       tvc.m_tx_fee_too_small = true;
       return false;
     }
@@ -141,17 +141,17 @@ namespace CryptoNote {
       uint64_t now = static_cast<uint64_t>(time(nullptr));
       if (ttl.ttl <= now) {
         logger(WARNING, BRIGHT_YELLOW) << "Transaction TTL has already expired: tx = " << id << ", ttl = " << ttl.ttl;
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       } else if (ttl.ttl - now > m_currency.mempoolTxLiveTime() + m_currency.blockFutureTimeLimit()) {
         logger(WARNING, BRIGHT_YELLOW) << "Transaction TTL is out of range: tx = " << id << ", ttl = " << ttl.ttl;
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       }
 
       if (fee != 0) {
         logger(WARNING, BRIGHT_YELLOW) << "Transaction with TTL has non-zero fee: tx = " << id << ", fee = " << m_currency.formatAmount(fee);
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       }
     }
@@ -165,7 +165,7 @@ namespace CryptoNote {
 				<< id 
 				<< " used already spent inputs";
 
-			tvc.m_verifivation_failed = true;
+			tvc.m_verification_failed = true;
 
 			return false;
 		}
@@ -179,7 +179,7 @@ namespace CryptoNote {
     if (!inputsValid) {
       if (!keptByBlock) {
         logger(INFO) << "tx used wrong inputs, rejected";
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       }
 
@@ -191,7 +191,7 @@ namespace CryptoNote {
       bool sizeValid = m_validator.checkTransactionSize(blobSize);
       if (!sizeValid) {
         logger(INFO) << "tx too big, rejected";
-        tvc.m_verifivation_failed = true;
+        tvc.m_verification_failed = true;
         return false;
       }
     }
@@ -200,7 +200,7 @@ namespace CryptoNote {
 
     if (!keptByBlock && m_recentlyDeletedTransactions.find(id) != m_recentlyDeletedTransactions.end()) {
       logger(INFO) << "Trying to add recently deleted transaction. Ignore: " << id;
-      tvc.m_verifivation_failed = false;
+      tvc.m_verification_failed = false;
       tvc.m_should_be_relayed = false;
       tvc.m_added_to_pool = false;
       return true;
@@ -235,12 +235,12 @@ namespace CryptoNote {
 
     tvc.m_added_to_pool = true;
     tvc.m_should_be_relayed = inputsValid && (fee > 0 || isFusionTransaction || ttl.ttl != 0);
-    tvc.m_verifivation_failed = true;
+    tvc.m_verification_failed = true;
 
     if (!addTransactionInputs(id, tx, keptByBlock))
       return false;
 
-    tvc.m_verifivation_failed = false;
+    tvc.m_verification_failed = false;
     //succeed
     return true;
   }
