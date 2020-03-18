@@ -156,25 +156,25 @@ namespace CryptoNote
 	const uint8_t  BLOCK_MINOR_VERSION_1                         =  1;
 
 	const std::size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT   =  10000;  //by default, blocks ids count in synchronizing
-	const std::size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT       =  128;    //by default, blocks count in blocks downloading
+	const std::size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT       =  256;    //by default, blocks count in blocks downloading
 	const std::size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT    =  1000;
 
 	const int      P2P_DEFAULT_PORT                              =  33711;//ZZP=33721, SLD=33711
 	const int      RPC_DEFAULT_PORT                              =  33712;//ZZP=33722, SLD=33712
 
-	const std::size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT           =  4096;
-	const std::size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT            =  1024;
+	const std::size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT           =  128;
+	const std::size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT            =  64;
 
 	const std::size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE     = 128 * 1024 * 1024; // 64 MB
-	const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 8;
-	const std::size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT= 85;
+	const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 16;
+	const std::size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT= 70;
 	const uint32_t P2P_DEFAULT_HANDSHAKE_INTERVAL                = 300;           // seconds
 	const uint32_t P2P_DEFAULT_PACKET_MAX_SIZE                   = 50000000;      // 50000000 bytes maximum packet size
 	const uint32_t P2P_DEFAULT_PEERS_IN_HANDSHAKE                = 64;
-	const uint32_t P2P_DEFAULT_CONNECTION_TIMEOUT                = 3000;          // 10 seconds
-	const uint32_t P2P_DEFAULT_PING_CONNECTION_TIMEOUT           = 3000;          // 10 seconds
+	const uint32_t P2P_DEFAULT_CONNECTION_TIMEOUT                = 5000;          // 10 seconds
+	const uint32_t P2P_DEFAULT_PING_CONNECTION_TIMEOUT           = 5000;          // 10 seconds
 	const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT                    = 60 * 2 * 1000; // 2 minutes
-	const std::size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT     = 3000;          // 10 seconds
+	const std::size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT     = 5000;          // 10 seconds
 	const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "ab99e468743e62c86e6d07a0db4f26db5fa6c46dc2ee899b459b3a205385d460";
 	
 	const uint32_t REBUILD_CACHE_DISPLAY_STEP					= 10000;
