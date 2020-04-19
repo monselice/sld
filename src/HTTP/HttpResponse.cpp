@@ -1,12 +1,17 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2014-2017 XDN-project developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+//----------------------------------------------------------------------------------------------------------------------
+#pragma once
 
-#include "HttpResponse.h"
-
+#include <sstream>
+#include <iostream>
 #include <stdexcept>
 
+#include "rulez.h"
+//#include "misc.h"
+#include "HttpResponse.h"
+
+//----------------------------------------------------------------------------------------------------------------------
 namespace {
 
 const char* getStatusString(CryptoNote::HttpResponse::HTTP_STATUS status) {
@@ -47,7 +52,11 @@ namespace CryptoNote {
 
 HttpResponse::HttpResponse() {
   status = STATUS_200;
-  headers["Server"] = "CryptoNote-based HTTP server";
+  
+  std::stringstream ss;
+  
+  ss << CRYPTONOTE_ASSET_NAME<<" HTTP server";
+  headers["Server"] = ss.str();
 }
 
 void HttpResponse::setStatus(HTTP_STATUS s) {

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2014-2017 XDN-project developers
 ////////////////////////////////////////////////////////////////////////////
-#include "rulez.h"
-
 #pragma once
+
+#include "rulez.h"
 
 #include <stdint.h>
 #include <initializer_list>
@@ -30,19 +30,19 @@ namespace CryptoNote
 		const std::size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 400; // 400 seems ok for Soldo
 		const std::size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 8;
 
-		const uint64_t COIN                                          = UINT64_C(100000000);// COIN - number of smallest units in one coin: 10000=ZZP, 100000000=SLD
+		const uint64_t COIN                                          = UINT64_C(100000000);// COIN - number of smallest units in one coin
 		const uint64_t MINIMUM_FEE                                   = UINT64_C(1);// Transactions with less than this fee wouldn’t be accepted by daemons
 		const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(2);//The amount bellow this value will be considered as dust: ZZP=1, SLD=2
 
-		const uint64_t REAL_COINS_LIMITED_Z                          = UINT64_C(10000000);//Total amount of coins mineable with full reward: 10000000=SLD,10000000000=ZZP
-		const uint64_t REAL_COINS_LOWSPEED_Z                         = UINT64_C(2500000);//Total amount of coins mineable with limited reward: 2500000=SLD,10000000000=ZZP
+		const uint64_t REAL_COINS_LIMITED_Z                          = UINT64_C(10000000);//Total amount of coins mineable with full reward
+		const uint64_t REAL_COINS_LOWSPEED_Z                         = UINT64_C(2500000);//Total amount of coins mineable with limited reward
 		const uint64_t MONEY_SUPPLY_MINEABLE_Z                       = REAL_COINS_LIMITED_Z*COIN;//Total amount of atomic units mineable with full reward
 		const uint64_t MONEY_SUPPLY_LOWSPEED_Z                       = REAL_COINS_LOWSPEED_Z*COIN;//Total amount of atomic units mineable with limited reward
-		const std::size_t   RUSH_BLOCKS_Z                            = 1000;//Premium rewarded blocks count: ZZP=500, SLD=1000
-		const uint64_t RUSH_REWARD_Z                                 = (UINT64_C(100)*COIN);//Reward for a premium block: ZZP=200000, SLD=100
-		const uint64_t COMMON_REWARD_Z                               = (UINT64_C(1)*COIN);//Reward for an ordinary block: ZZP=1000, SLD=1
+		const std::size_t   RUSH_BLOCKS_Z                            = 1000;//Premium rewarded blocks count
+		const uint64_t RUSH_REWARD_Z                                 = (UINT64_C(100)*COIN);//Reward for a premium block
+		const uint64_t COMMON_REWARD_Z                               = (UINT64_C(1)*COIN);//Reward for an ordinary block
 		const uint64_t GENESIS_BLOCK_REWARD_Z						= (UINT64_C(50000));//Premine amount SLD=50000
-		const std::size_t   RUSH_REWARD_LOCK_Z                            = 750000;//Premium rewarded blocks lock time: ZZP=20000, SLD=750000
+		const std::size_t   RUSH_REWARD_LOCK_Z                            = 750000;//Premium rewarded blocks lock time
 
 #ifdef IS_PREMINE_IN_ZERO_BLOCK
 		const uint64_t INITIAL_BLOCKS_TO_SKIP_Z = 1;	
@@ -54,7 +54,7 @@ namespace CryptoNote
 		const uint64_t FIRST_BLOCK_REWARD_Z = GENESIS_BLOCK_REWARD_Z*COIN;
 #endif
 
-		const uint64_t DIFFICULTY_TARGET                             = 20;//Difficulty target is an ideal time period between blocks, in seconds. 20=SLD, 720=ZZP
+		const uint64_t DIFFICULTY_TARGET                             = 20;//Difficulty target is an ideal time period between blocks, in seconds
 		const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;
 		
 #ifndef PASSATELLI
@@ -66,19 +66,9 @@ namespace CryptoNote
 		static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 #endif
 
-		const std::size_t   DIFFICULTY_FNC_VER                            = 0;//0=SLD, 2=ZZP
-		const std::size_t   DIFFICULTY_ZAWY_WINDOW                        = 30;//30=SLD, 12=ZZP
-/*
-		const uint64_t DEPOSIT_MIN_AMOUNT                            = 1 * COIN;
-		const uint32_t DEPOSIT_MIN_TERM                              = 11000;
-		const uint32_t DEPOSIT_MAX_TERM                              = 10 * 12 * 11000;
-		const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR                 = 77000;
-		const uint64_t DEPOSIT_MAX_TOTAL_RATE                        = 11;
+		const std::size_t   DIFFICULTY_FNC_VER                            = 0;
+		const std::size_t   DIFFICULTY_ZAWY_WINDOW                        = 30;
 
-		static_assert(DEPOSIT_MIN_TERM > 0, "Bad DEPOSIT_MIN_TERM");
-		static_assert(DEPOSIT_MIN_TERM <= DEPOSIT_MAX_TERM, "Bad DEPOSIT_MAX_TERM");
-		static_assert(DEPOSIT_MIN_TERM * DEPOSIT_MAX_TOTAL_RATE > DEPOSIT_MIN_TOTAL_RATE_FACTOR, "Bad DEPOSIT_MIN_TOTAL_RATE_FACTOR or DEPOSIT_MAX_TOTAL_RATE");
-*/
 		const std::size_t   MAX_BLOCK_SIZE_INITIAL                        = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE * 4;
 		const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_NUMERATOR         = 100 * 1024;
 		const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR       = 365 * 24 * 60 * 60 / DIFFICULTY_TARGET;
@@ -159,8 +149,11 @@ namespace CryptoNote
 	const std::size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT       =  256;    //by default, blocks count in blocks downloading
 	const std::size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT    =  1000;
 
-	const int      P2P_DEFAULT_PORT                              =  33711;//ZZP=33721, SLD=33711
-	const int      RPC_DEFAULT_PORT                              =  33712;//ZZP=33722, SLD=33712
+	const int      P2P_DEFAULT_PORT                              =  33711; //daemons p2p talk
+	const int      RPC_DEFAULT_PORT                              =  33712; //daemon to wallet talk
+	const int      RPC_WALLET_PORT                               =  33717; //daemon to wallet talk
+	const int      RPC_PAYS_PORT                                 =  33719; //daemon to wallet talk
+	const int      P2P_PAYS_PORT                                 =  33718; //daemon to wallet talk
 
 	const std::size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT           =  128;
 	const std::size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT            =  64;

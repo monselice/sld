@@ -1,7 +1,8 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2014-2017 XDN-project developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+////////////////////////////////////////////////////////////////////////////
+#include "rulez.h"
+#include "version.h"
 
 #include "PaymentServiceConfiguration.h"
 #include "CryptoNoteConfig.h"
@@ -12,6 +13,12 @@
 
 #include "Logging/ILogger.h"
 
+#include "Logging/ConsoleLogger.h"
+#include <Logging/LoggerManager.h>
+
+//#include "zrainbow.h"
+
+////////////////////////////////////////////////////////////////////////////
 namespace po = boost::program_options;
 
 namespace PaymentService {
@@ -32,19 +39,19 @@ Configuration::Configuration() {
 void Configuration::initOptions(boost::program_options::options_description& desc) {
   desc.add_options()
       ("bind-address", po::value<std::string>()->default_value("0.0.0.0"), "payment service bind address")
-      ("bind-port", po::value<uint16_t>()->default_value(8070), "payment service bind port")
-      ("rpc-user", po::value<std::string>()->default_value(""), "username to use the payment service. If authorization is not required, leave it empty")
-      ("rpc-password", po::value<std::string>()->default_value(""), "password to use the payment service. If authorization is not required, leave it empty")
+      ("bind-port", po::value<uint16_t>()->default_value(CryptoNote::RPC_PAYS_PORT), "payment service bind port")
+      ("rpc-user", po::value<std::string>()->default_value(""), "(optional) username to use the payment service")
+      ("rpc-password", po::value<std::string>()->default_value(""), "(optional) password to use the payment service")
       ("container-file,w", po::value<std::string>(), "container file")
       ("container-password,p", po::value<std::string>(), "container password")
       ("generate-container,g", "generate new container file with one wallet and exit")
       ("daemon,d", "run as daemon in Unix or as service in Windows")
 #ifdef _WIN32
-      ("register-service", "register service and exit (Windows only)")
-      ("unregister-service", "unregister service and exit (Windows only)")
+      ("register-service", "register service and exit")
+      ("unregister-service", "unregister service and exit")
 #endif
       ("log-file,l", po::value<std::string>(), "log file")
-      ("server-root", po::value<std::string>(), "server root. The service will use it as working directory. Don't set it if don't want to change it")
+      ("server-root", po::value<std::string>(), "(optional) server working directory")
       ("log-level", po::value<size_t>(), "log level")
       ("address", "print wallet addresses and exit");
 }

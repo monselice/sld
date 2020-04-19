@@ -10,6 +10,8 @@
 ////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include <string>
+#include <sstream>
 #include <iosfwd>
 #include <iostream>
 /*

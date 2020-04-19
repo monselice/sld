@@ -1,8 +1,7 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2014-2017 XDN-project developers
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
 #include "rulez.h"
-
 #include "version.h"
 
 #include <boost/filesystem.hpp>
@@ -25,18 +24,16 @@
 #include "P2p/NetNodeConfig.h"
 #include "Rpc/RpcServer.h"
 #include "Rpc/RpcServerConfig.h"
-#include "version.h"
 
 #include "Logging/ConsoleLogger.h"
 #include <Logging/LoggerManager.h>
 
 #include "zrainbow.h"
 
-
 #if defined(WIN32)
 #include <crtdbg.h>
 #endif
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
 using Common::JsonValue;
 using namespace CryptoNote;
 using namespace Logging;
@@ -54,7 +51,7 @@ namespace
   const command_line::arg_descriptor<bool>        arg_testnet_on  = {"testnet", "Used to deploy test nets. Checkpoints and hardcoded seeds are ignored, "
     "network id is changed. Use it with --data-dir flag. The wallet must be launched with --testnet flag.", false};
 }
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
 bool command_line_preprocessor(const boost::program_options::variables_map& vm, LoggerRef& logger);
 
 void print_genesis_tx_hex() {
@@ -80,7 +77,7 @@ void print_genesis_tx_hex() {
 
 	return;
 }
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
 JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
   JsonValue loggerConfiguration(JsonValue::OBJECT);
   loggerConfiguration.insert("globalLevel", static_cast<int64_t>(level));
@@ -99,7 +96,7 @@ JsonValue buildLoggerConfiguration(Level level, const std::string& logfile) {
 
   return loggerConfiguration;
 }
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
 void renameDataDir() {
 
   std::string AppDir = Tools::getDefaultDataDirectory();
@@ -111,8 +108,8 @@ void renameDataDir() {
 
   std::string dataDirPrefix = AppDir.substr(0, AppDir.size() + 1 - sizeof(CRYPTONOTE_TICKER));
 }
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
 #ifdef WIN32

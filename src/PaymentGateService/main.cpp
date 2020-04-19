@@ -1,9 +1,13 @@
 // Copyright (c) 2011-2016 The Cryptonote developers
 // Copyright (c) 2014-2017 XDN-project developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+////////////////////////////////////////////////////////////////////////////
+#pragma once
 
 #include "rulez.h"
+#include "version.h"
+
+#include "CryptoNoteConfig.h"
+#include "misc.h"
 
 #include <iostream>
 #include <memory>
@@ -12,22 +16,33 @@
 #include <string.h>
 
 #include "PaymentGateService.h"
-#include "version.h"
 
 #ifdef WIN32
+
 #include <windows.h>
 #include <winsvc.h>
+
 #else
+	
 #include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
+
 #endif
 
-std::string SERVICE_NAME_STR = std::string(CRYPTONOTE_ASSET_NAME)+" Payments Gate";
-const char * SERVICE_NAME = SERVICE_NAME_STR.c_str();;
+#include "Logging/ConsoleLogger.h"
+#include <Logging/LoggerManager.h>
+
+//#include "zrainbow.h"
+
+////////////////////////////////////////////////////////////////////////////
+
+
+//std::string misc::RPC_SERVICE_NAME_STR = std::string(CRYPTONOTE_ASSET_NAME)+" Payments Gate";
+//const char * misc::RPC_SERVICE_NAME = misc::RPC_SERVICE_NAME_STR.c_str();;
 
 PaymentGateService* ppg;
 
@@ -48,42 +63,45 @@ std::string GetLastErrorMessage(DWORD errorMessageID)
 }
 
 void __stdcall serviceHandler(DWORD fdwControl) {
-  if (fdwControl == SERVICE_CONTROL_STOP) {
-    Logging::LoggerRef log(ppg->getLogger(), "serviceHandler");
-    log(Logging::INFO, Logging::BRIGHT_YELLOW) << "Stop signal caught";
+	if (fdwControl == SERVICE_CONTROL_STOP) {
+		
+		Logging::LoggerRef log(ppg->getLogger(), misc::STR_0001);
+		log(Logging::INFO, Logging::BRIGHT_YELLOW) << misc::STR_0002;
 
-    SERVICE_STATUS serviceStatus{ SERVICE_WIN32_OWN_PROCESS, SERVICE_STOP_PENDING, 0, NO_ERROR, 0, 0, 0 };
-    SetServiceStatus(serviceStatusHandle, &serviceStatus);
+		SERVICE_STATUS serviceStatus{ SERVICE_WIN32_OWN_PROCESS, SERVICE_STOP_PENDING, 0, NO_ERROR, 0, 0, 0 };
+		SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
-    ppg->stop();
-  }
+		ppg->stop();
+	}
 }
 
 void __stdcall serviceMain(DWORD dwArgc, char **lpszArgv) {
-  Logging::LoggerRef logRef(ppg->getLogger(), "WindowsService");
+  Logging::LoggerRef logRef(ppg->getLogger(), misc::STR_0003);
 
-  serviceStatusHandle = RegisterServiceCtrlHandler("PaymentGate", serviceHandler);
+  serviceStatusHandle = RegisterServiceCtrlHandler(misc::RPC_SERVICE_NAME, serviceHandler);
+//  serviceStatusHandle = RegisterServiceCtrlHandler("PaymentGate", serviceHandler);
+  
   if (serviceStatusHandle == NULL) {
-    logRef(Logging::FATAL, Logging::BRIGHT_RED) << "Couldn't make RegisterServiceCtrlHandler call: " << GetLastErrorMessage(GetLastError());
+    logRef(Logging::FATAL, Logging::BRIGHT_RED) << misc::STR_0006 << GetLastErrorMessage(GetLastError());
     return;
   }
 
   SERVICE_STATUS serviceStatus{ SERVICE_WIN32_OWN_PROCESS, SERVICE_START_PENDING, 0, NO_ERROR, 0, 1, 3000 };
   if (SetServiceStatus(serviceStatusHandle, &serviceStatus) != TRUE) {
-    logRef(Logging::FATAL, Logging::BRIGHT_RED) << "Couldn't make SetServiceStatus call: " << GetLastErrorMessage(GetLastError());
+    logRef(Logging::FATAL, Logging::BRIGHT_RED) << misc::STR_0007 << GetLastErrorMessage(GetLastError());
     return;
   }
 
   serviceStatus = { SERVICE_WIN32_OWN_PROCESS, SERVICE_RUNNING, SERVICE_ACCEPT_STOP, NO_ERROR, 0, 0, 0 };
   if (SetServiceStatus(serviceStatusHandle, &serviceStatus) != TRUE) {
-    logRef(Logging::FATAL, Logging::BRIGHT_RED) << "Couldn't make SetServiceStatus call: " << GetLastErrorMessage(GetLastError());
+    logRef(Logging::FATAL, Logging::BRIGHT_RED) << misc::STR_0007 << GetLastErrorMessage(GetLastError());
     return;
   }
 
   try {
     ppg->run();
   } catch (std::exception& ex) {
-    logRef(Logging::FATAL, Logging::BRIGHT_RED) << "Error occurred: " << ex.what();
+    logRef(Logging::FATAL, Logging::BRIGHT_RED) << misc::STR_0008 << ex.what();
   }
 
   serviceStatus = { SERVICE_WIN32_OWN_PROCESS, SERVICE_STOPPED, 0, NO_ERROR, 0, 0, 0 };
@@ -125,18 +143,19 @@ int runDaemon() {
 #ifdef WIN32
 
   SERVICE_TABLE_ENTRY serviceTable[] {
-    { "Payment Gate", serviceMain },
+    { const_cast<char *>(misc::RPC_SERVICE_NAME), serviceMain },
+    //{ "Payment Gate", serviceMain },
     { NULL, NULL }
   };
 
-  Logging::LoggerRef logRef(ppg->getLogger(), "RunService");
+  Logging::LoggerRef logRef(ppg->getLogger(), misc::STR_0009);
 
   if (StartServiceCtrlDispatcher(serviceTable) != TRUE) {
-    logRef(Logging::FATAL, Logging::BRIGHT_RED) << "Couldn't start service: " << GetLastErrorMessage(GetLastError());
+    logRef(Logging::FATAL, Logging::BRIGHT_RED) << misc::STR_0010 << GetLastErrorMessage(GetLastError());
     return 1;
   }
 
-  logRef(Logging::INFO) << "Service stopped";
+  logRef(Logging::INFO) << misc::STR_0011;
   return 0;
 
 #else
@@ -159,7 +178,7 @@ int runDaemon() {
 
 int registerService() {
 #ifdef WIN32
-  Logging::LoggerRef logRef(ppg->getLogger(), "ServiceRegistrator");
+  Logging::LoggerRef logRef(ppg->getLogger(), misc::STR_0012);
 
   char pathBuff[MAX_PATH];
   std::string modulePath;
@@ -177,16 +196,17 @@ int registerService() {
     modulePath.assign(pathBuff);
 
     std::string moduleDir = modulePath.substr(0, modulePath.find_last_of('\\') + 1);
-    modulePath += " --config=" + moduleDir + "payment_service.conf -d";
+    modulePath += " --config=" + moduleDir + misc::DEFAULT_CONFIG + " -d";
 
     scManager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT | SC_MANAGER_CREATE_SERVICE);
     if (scManager == NULL) {
       logRef(Logging::FATAL, Logging::BRIGHT_RED) << "OpenSCManager failed with error: " << GetLastErrorMessage(GetLastError());
+      logRef(Logging::FATAL, Logging::RED) << "Try to Run As Administrator";
       ret = 1;
       break;
     }
 
-    scService = CreateService(scManager, SERVICE_NAME, NULL, SERVICE_QUERY_STATUS, SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,
+    scService = CreateService(scManager, misc::RPC_SERVICE_NAME, NULL, SERVICE_QUERY_STATUS, SERVICE_WIN32_OWN_PROCESS, SERVICE_AUTO_START,
       SERVICE_ERROR_NORMAL, modulePath.c_str(), NULL, NULL, NULL, NULL, NULL);
 
     if (scService == NULL) {
@@ -195,8 +215,8 @@ int registerService() {
       break;
     }
 
-    logRef(Logging::INFO) << "Service is registered successfully";
-    logRef(Logging::INFO) << "Please make sure " << moduleDir + "payment_service.conf" << " exists";
+    logRef(Logging::INFO, Logging::BRIGHT_GREEN) << "Service is registered successfully";
+    logRef(Logging::INFO) << "Please make sure " << moduleDir + misc::DEFAULT_CONFIG << " exists";
     break;
   }
 
@@ -216,7 +236,7 @@ int registerService() {
 
 int unregisterService() {
 #ifdef WIN32
-  Logging::LoggerRef logRef(ppg->getLogger(), "ServiceDeregistrator");
+  Logging::LoggerRef logRef(ppg->getLogger(), misc::STR_0013);
 
   SC_HANDLE scManager = NULL;
   SC_HANDLE scService = NULL;
@@ -231,7 +251,7 @@ int unregisterService() {
       break;
     }
 
-    scService = OpenService(scManager, SERVICE_NAME, SERVICE_STOP | SERVICE_QUERY_STATUS | DELETE);
+    scService = OpenService(scManager, misc::RPC_SERVICE_NAME, SERVICE_STOP | SERVICE_QUERY_STATUS | DELETE);
     if (scService == NULL) {
       logRef(Logging::FATAL, Logging::BRIGHT_RED) << "OpenService failed with error: " << GetLastErrorMessage(GetLastError());
       ret = 1;
@@ -239,7 +259,7 @@ int unregisterService() {
     }
 
     if (ControlService(scService, SERVICE_CONTROL_STOP, &ssSvcStatus)) {
-      logRef(Logging::INFO) << "Stopping " << SERVICE_NAME;
+      logRef(Logging::INFO) << "Stopping " << misc::RPC_SERVICE_NAME;
       Sleep(1000);
 
       while (QueryServiceStatus(scService, &ssSvcStatus)) {
@@ -253,9 +273,9 @@ int unregisterService() {
 
       std::cout << std::endl;
       if (ssSvcStatus.dwCurrentState == SERVICE_STOPPED) {
-        logRef(Logging::INFO) << SERVICE_NAME << " is stopped";
+        logRef(Logging::INFO) << misc::RPC_SERVICE_NAME << " is stopped";
       } else {
-        logRef(Logging::FATAL, Logging::BRIGHT_RED) << SERVICE_NAME << " failed to stop" << std::endl;
+        logRef(Logging::FATAL, Logging::BRIGHT_RED) << misc::RPC_SERVICE_NAME << " failed to stop" << std::endl;
       }
     }
 
@@ -265,7 +285,7 @@ int unregisterService() {
       break;
     }
 
-    logRef(Logging::INFO) << SERVICE_NAME << " is removed";
+    logRef(Logging::INFO) << misc::RPC_SERVICE_NAME << " is removed";
     break;
   }
 
@@ -292,7 +312,7 @@ int main(int argc, char** argv) {
       return 0; //help message requested or so
     }
 
-    Logging::LoggerRef(pg.getLogger(), "main")(Logging::INFO) << "PaymentService " << " " << PROJECT_VERSION_LONG;
+    Logging::LoggerRef(pg.getLogger(), "main")(Logging::INFO,Logging::CYAN) << CryptoNote::CRYPTONOTE_NAME << " RPC " << PROJECT_VERSION_LONG;
 
     const auto& config = pg.getConfig();
 

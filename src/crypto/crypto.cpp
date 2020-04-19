@@ -29,24 +29,23 @@ namespace Crypto {
   }
 
   mutex random_lock;
-
-  static inline void random_scalar(EllipticCurveScalar &res) {
-    unsigned char tmp[64];
-    generate_random_bytes(64, tmp);
-    sc_reduce(tmp);
-    memcpy(&res, tmp, 32);
-  }
-
-  static inline void hash_to_scalar(const void *data, size_t length, EllipticCurveScalar &res) {
-    cn_fast_hash(data, length, reinterpret_cast<Hash &>(res));
-    sc_reduce32(reinterpret_cast<unsigned char*>(&res));
-  }
-  
-  
-//////////////////////////////////////////////////////////////////////  
+//----------------------------------------------------------------------------------------------------------------------  
+static inline void random_scalar(EllipticCurveScalar &res) {
+	unsigned char tmp[64];
+	
+	generate_random_bytes(64, tmp);
+	sc_reduce(tmp);
+	memcpy(&res, tmp, 32);
+}
+//----------------------------------------------------------------------------------------------------------------------  
+static inline void hash_to_scalar(const void *data, size_t length, EllipticCurveScalar &res) {
+	cn_fast_hash(data, length, reinterpret_cast<Hash &>(res));
+	sc_reduce32(reinterpret_cast<unsigned char*>(&res));
+}
+//----------------------------------------------------------------------------------------------------------------------  
 //generate public and secret keys from a random 256-bit integer or
 //recover from recovery_key if is_recovery = true
-//////////////////////////////////////////////////////////////////////  
+//----------------------------------------------------------------------------------------------------------------------  
 SecretKey crypto_ops::generate_keys_or_recover
 	(
 		PublicKey &pub, 
@@ -80,7 +79,7 @@ SecretKey crypto_ops::generate_keys_or_recover
 
 	return rng;
 }
-//////////////////////////////////////////////////////////////////////  
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::generate_keys(PublicKey &pub, SecretKey &sec) {
     lock_guard<mutex> lock(random_lock);
     ge_p3 point;
@@ -88,7 +87,7 @@ SecretKey crypto_ops::generate_keys_or_recover
     ge_scalarmult_base(&point, reinterpret_cast<unsigned char*>(&sec));
     ge_p3_tobytes(reinterpret_cast<unsigned char*>(&pub), &point);
   }
-//////////////////////////////////////////////////////////////////////  
+//----------------------------------------------------------------------------------------------------------------------  
 void crypto_ops::generate_keys_from_seed(PublicKey &pub, SecretKey &sec, SecretKey &seed) {
 	
 	ge_p3 point;
@@ -98,7 +97,7 @@ void crypto_ops::generate_keys_from_seed(PublicKey &pub, SecretKey &sec, SecretK
 	ge_scalarmult_base(&point, reinterpret_cast<unsigned char*>(&sec));
 	ge_p3_tobytes(reinterpret_cast<unsigned char*>(&pub), &point);
 }
-//////////////////////////////////////////////////////////////////////  
+//----------------------------------------------------------------------------------------------------------------------  
 bool crypto_ops::check_skey(const SecretKey &key) {
     ge_p3 point;
     if (sc_check(reinterpret_cast<const unsigned char*>(&key)) != 0) {
@@ -106,12 +105,12 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     }
 	return true;
 }
-//////////////////////////////////////////////////////////////////////  
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::check_key(const PublicKey &key) {
     ge_p3 point;
     return ge_frombytes_vartime(&point, reinterpret_cast<const unsigned char*>(&key)) == 0;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::secret_key_to_public_key(const SecretKey &sec, PublicKey &pub) {
     ge_p3 point;
     if (sc_check(reinterpret_cast<const unsigned char*>(&sec)) != 0) {
@@ -121,7 +120,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_p3_tobytes(reinterpret_cast<unsigned char*>(&pub), &point);
     return true;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::generate_key_derivation(const PublicKey &key1, const SecretKey &key2, KeyDerivation &derivation) {
     ge_p3 point;
     ge_p2 point2;
@@ -136,7 +135,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&derivation), &point2);
     return true;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   static void derivation_to_scalar(const KeyDerivation &derivation, size_t output_index, EllipticCurveScalar &res) {
     struct {
       KeyDerivation derivation;
@@ -148,7 +147,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     assert(end <= buf.output_index + sizeof buf.output_index);
     hash_to_scalar(&buf, end - reinterpret_cast<char *>(&buf), res);
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   static void derivation_to_scalar(const KeyDerivation &derivation, size_t output_index, const uint8_t* suffix, size_t suffixLength, EllipticCurveScalar &res) {
     assert(suffixLength <= 32);
     struct {
@@ -163,7 +162,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     memcpy(end, suffix, suffixLength);
     hash_to_scalar(&buf, bufSize + suffixLength, res);
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::derive_public_key(const KeyDerivation &derivation, size_t output_index,
     const PublicKey &base, PublicKey &derived_key) {
     EllipticCurveScalar scalar;
@@ -183,7 +182,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&derived_key), &point5);
     return true;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::derive_public_key(const KeyDerivation &derivation, size_t output_index,
     const PublicKey &base, const uint8_t* suffix, size_t suffixLength, PublicKey &derived_key) {
     EllipticCurveScalar scalar;
@@ -203,7 +202,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&derived_key), &point5);
     return true;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::underive_public_key_and_get_scalar(const KeyDerivation &derivation, size_t output_index,
     const PublicKey &derived_key, PublicKey &base, EllipticCurveScalar &hashed_derivation) {
     ge_p3 point1;
@@ -222,7 +221,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&base), &point5);
     return true;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::derive_secret_key(const KeyDerivation &derivation, size_t output_index,
     const SecretKey &base, SecretKey &derived_key) {
     EllipticCurveScalar scalar;
@@ -230,7 +229,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     derivation_to_scalar(derivation, output_index, scalar);
     sc_add(reinterpret_cast<unsigned char*>(&derived_key), reinterpret_cast<const unsigned char*>(&base), reinterpret_cast<unsigned char*>(&scalar));
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::derive_secret_key(const KeyDerivation &derivation, size_t output_index,
     const SecretKey &base, const uint8_t* suffix, size_t suffixLength, SecretKey &derived_key) {
     EllipticCurveScalar scalar;
@@ -238,8 +237,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     derivation_to_scalar(derivation, output_index, suffix, suffixLength, scalar);
     sc_add(reinterpret_cast<unsigned char*>(&derived_key), reinterpret_cast<const unsigned char*>(&base), reinterpret_cast<unsigned char*>(&scalar));
   }
-
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::underive_public_key(const KeyDerivation &derivation, size_t output_index,
     const PublicKey &derived_key, PublicKey &base) {
     EllipticCurveScalar scalar;
@@ -259,7 +257,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&base), &point5);
     return true;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::underive_public_key(const KeyDerivation &derivation, size_t output_index,
     const PublicKey &derived_key, const uint8_t* suffix, size_t suffixLength, PublicKey &base) {
     EllipticCurveScalar scalar;
@@ -280,14 +278,14 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&base), &point5);
     return true;
   }
-
-
+//----------------------------------------------------------------------------------------------------------------------  
+//----------------------------------------------------------------------------------------------------------------------  
   struct s_comm {
     Hash h;
     EllipticCurvePoint key;
     EllipticCurvePoint comm;
   };
-
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::generate_signature(const Hash &prefix_hash, const PublicKey &pub, const SecretKey &sec, Signature &sig) {
     lock_guard<mutex> lock(random_lock);
     ge_p3 tmp3;
@@ -311,7 +309,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     hash_to_scalar(&buf, sizeof(s_comm), reinterpret_cast<EllipticCurveScalar&>(sig));
     sc_mulsub(reinterpret_cast<unsigned char*>(&sig) + 32, reinterpret_cast<unsigned char*>(&sig), reinterpret_cast<const unsigned char*>(&sec), reinterpret_cast<unsigned char*>(&k));
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::check_signature(const Hash &prefix_hash, const PublicKey &pub, const Signature &sig) {
     ge_p2 tmp2;
     ge_p3 tmp3;
@@ -332,7 +330,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     sc_sub(reinterpret_cast<unsigned char*>(&c), reinterpret_cast<unsigned char*>(&c), reinterpret_cast<const unsigned char*>(&sig));
     return sc_isnonzero(reinterpret_cast<unsigned char*>(&c)) == 0;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   static void hash_to_ec(const PublicKey &key, ge_p3 &res) {
     Hash h;
     ge_p2 point;
@@ -342,7 +340,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_mul8(&point2, &point);
     ge_p1p1_to_p3(&res, &point2);
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   KeyImage crypto_ops::scalarmultKey(const KeyImage & P, const KeyImage & a) {
     ge_p3 A;
     ge_p2 R;
@@ -353,7 +351,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_tobytes(reinterpret_cast<unsigned char*>(&aP), &R);
     return aP;
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::hash_data_to_ec(const uint8_t* data, std::size_t len, PublicKey& key) {
     Hash h;
     ge_p2 point;
@@ -364,7 +362,7 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_p1p1_to_p2(&point, &point2);
     ge_tobytes(reinterpret_cast<unsigned char*>(&key), &point);
   }
-  
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::generate_key_image(const PublicKey &pub, const SecretKey &sec, KeyImage &image) {
     ge_p3 point;
     ge_p2 point2;
@@ -373,13 +371,13 @@ bool crypto_ops::check_skey(const SecretKey &key) {
     ge_scalarmult(&point2, reinterpret_cast<const unsigned char*>(&sec), &point);
     ge_tobytes(reinterpret_cast<unsigned char*>(&image), &point2);
   }
-  
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::generate_incomplete_key_image(const PublicKey &pub, EllipticCurvePoint &incomplete_key_image) {
     ge_p3 point;
     hash_to_ec(pub, point);
     ge_p3_tobytes(reinterpret_cast<unsigned char*>(&incomplete_key_image), &point);
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
 #ifdef _MSC_VER
 #pragma warning(disable: 4200)
 #endif
@@ -390,14 +388,14 @@ bool crypto_ops::check_skey(const SecretKey &key) {
       EllipticCurvePoint a, b;
     } ab[];
   };
-	
+//----------------------------------------------------------------------------------------------------------------------  
 static inline size_t rs_comm_size(size_t pubs_count) {
-//$$$$
+//zz
 //    return sizeof(rs_comm) + pubs_count * sizeof(rs_comm().ab[0]);
     return sizeof(rs_comm) + pubs_count * 2 * sizeof(EllipticCurvePoint); /* BEWARE: Dependent on rs_comm definition above! */
-//$$$$
+//zz
 }
-
+//----------------------------------------------------------------------------------------------------------------------  
   void crypto_ops::generate_ring_signature(const Hash &prefix_hash, const KeyImage &image,
     const PublicKey *const *pubs, size_t pubs_count,
     const SecretKey &sec, size_t sec_index,
@@ -459,7 +457,7 @@ static inline size_t rs_comm_size(size_t pubs_count) {
     sc_sub(reinterpret_cast<unsigned char*>(&sig[sec_index]), reinterpret_cast<unsigned char*>(&h), reinterpret_cast<unsigned char*>(&sum));
     sc_mulsub(reinterpret_cast<unsigned char*>(&sig[sec_index]) + 32, reinterpret_cast<unsigned char*>(&sig[sec_index]), reinterpret_cast<const unsigned char*>(&sec), reinterpret_cast<unsigned char*>(&k));
   }
-
+//----------------------------------------------------------------------------------------------------------------------  
   bool crypto_ops::check_ring_signature(const Hash &prefix_hash, const KeyImage &image,
     const PublicKey *const *pubs, size_t pubs_count,
     const Signature *sig) {
@@ -500,3 +498,6 @@ static inline size_t rs_comm_size(size_t pubs_count) {
     return sc_isnonzero(reinterpret_cast<unsigned char*>(&h)) == 0;
   }
 }
+//----------------------------------------------------------------------------------------------------------------------  
+//----------------------------------------------------------------------------------------------------------------------  
+//----------------------------------------------------------------------------------------------------------------------  
