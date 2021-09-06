@@ -3,6 +3,9 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <boost/format.hpp>
+#include <ctime>
+
 #include "DaemonCommandsHandler.h"
 
 #include "P2p/NetNode.h"
@@ -27,7 +30,11 @@ namespace {
 }
 
 
-DaemonCommandsHandler::DaemonCommandsHandler(CryptoNote::core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log) :
+DaemonCommandsHandler::DaemonCommandsHandler(
+	CryptoNote::core& core, 
+	CryptoNote::NodeServer& srv, 
+	Logging::LoggerManager& log
+) :
   m_core(core), m_srv(srv), logger(log, "daemon"), m_logManager(log) {
   m_consoleHandler.setHandler("exit", boost::bind(&DaemonCommandsHandler::exit, this, _1), "Shutdown the daemon");
   m_consoleHandler.setHandler("help", boost::bind(&DaemonCommandsHandler::help, this, _1), "Show this help");

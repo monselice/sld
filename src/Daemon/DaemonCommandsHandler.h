@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <algorithm>
+
 #include "Common/ConsoleHandler.h"
 
 #include <Logging/LoggerRef.h>

@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <algorithm>
+
 #include <string>
 #include <vector>
 #include <boost/variant.hpp>

@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <algorithm>
+
 #include "CryptoNoteFormatUtils.h"
 #include "TransactionExtra.h"
 

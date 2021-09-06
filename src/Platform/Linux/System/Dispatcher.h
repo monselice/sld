@@ -7,6 +7,7 @@
 #include <functional>
 #include <queue>
 #include <stack>
+#include <stdexcept>
 
 #ifndef __GLIBC__
 

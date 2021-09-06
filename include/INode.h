@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <algorithm>
+
 #include <cstdint>
 #include <functional>
 #include <system_error>
