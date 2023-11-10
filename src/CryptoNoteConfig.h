@@ -124,8 +124,8 @@ namespace CryptoNote
 	const uint64_t Z_FORK_BLOCK_12									= 0;// not happend yet
 	const uint64_t Z_FORK_BLOCK_13									= 0;// not happend yet
 	
-	const uint64_t BINARY_INPUT_STREAM_SERIALIZER_MAX_ARRAY_SIZE	= UINT64_C(536870912);//Easy magic by Zhe
-	const uint64_t BINARY_INPUT_STREAM_SERIALIZER_MAX_STRING_SIZE	= UINT64_C(536870912);//Another magic by Zhe
+	const uint64_t BINARY_INPUT_STREAM_SERIALIZER_MAX_ARRAY_SIZE	= UINT64_C(1073741824);//Easy magic by Zhe
+	const uint64_t BINARY_INPUT_STREAM_SERIALIZER_MAX_STRING_SIZE	= UINT64_C(1073741824);//Another magic by Zhe
 	
 	const uint64_t  MAX_ROOT_BLOCK_SIZE_Z							= 2048;//some shit checked @ checkRootBlockSize
 	
