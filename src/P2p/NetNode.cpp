@@ -216,7 +216,7 @@ namespace CryptoNote
     m_dispatcher(dispatcher),
     m_workingContextGroup(dispatcher),
     m_payload_handler(payload_handler),
-    m_allow_local_ip(false),
+    m_allow_local_ip(true),
     m_hide_my_port(false),
     m_network_id(CRYPTONOTE_NETWORK),
     logger(log, "node_server"),
