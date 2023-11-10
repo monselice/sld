@@ -173,12 +173,12 @@ namespace CryptoNote
 	const uint32_t REBUILD_CACHE_DISPLAY_STEP					= 10000;
 
 	const std::initializer_list<const char*> SEED_NODES = {
-		"s1.soldo.in:33711",  
-		"s2.soldo.in:33711",  
-		"s3.soldo.in:33711",  
-		"s4.soldo.in:33711",  
-		"s5.soldo.in:33711",  
-		"s6.soldo.in:33711",  
+		"s1_soldo:33711",  
+		"s2_soldo:33711",  
+		"s3_soldo:33711",  
+		"s4_soldo:33711",  
+		"s5_soldo:33711",  
+		"s6_soldo:33711",  
 	};
 
 	struct CheckpointData {
